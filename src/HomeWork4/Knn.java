@@ -119,17 +119,22 @@ public class Knn implements Classifier {
 	}
 	
 	private Instances findNearestNeighbors(Instance instance) {
+		boolean newMax = true;
 		Instances neighbors = new Instances(m_trainingInstances,0);
 		for(int i=0; i<currentTrainingInstances.numInstances(); i++) {
 			if(neighbors.numInstances() < k) {
 				neighbors.add(currentTrainingInstances.get(i));
 			}
 			else {
-				Instance max = getMaxNeighbor(instance, neighbors);
-				distanceThreshold = distance(instance, max);
-				if(distance(instance,max) > distance(instance , currentTrainingInstances.get(i))){
+				if(newMax) {
+					Instance max = getMaxNeighbor(instance, neighbors);
+					distanceThreshold = distance(instance, max);
+					newMax = false;
+				}
+				if(distanceThreshold > distance(instance ,currentTrainingInstances.get(i))){
 					neighbors.remove(neighbors.indexOf(max));
 					neighbors.add(currentTrainingInstances.get(i));
+					newMax = true;
 				}
 			}
 		}
